@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بوابة الفوارس الرقمية - النظام السيادي المطور</title>
+    <style>
+        :root {
+            --primary-gold: #c5a059;
+            --gold-glow: rgba(197, 160, 89, 0.3);
+            --dark-blue: #0b131f;
+            --slate-black: #060a10;
+            --panel-bg: rgba(17, 26, 36, 0.95);
+            --text-light: #f5f7fa;
+            --danger-red: #ff5252;
+            --success-green: #4caf50;
+            --editor-purple: #ab47bc;
+            --chat-bg: #070c14;
+            --my-bubble: #1f2c3f;
+            --other-bubble: #121b26;
+            --justice-blue: #1565c0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at top, #162234, var(--slate-black));
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* شاشة تسجيل الدخول */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 9999;
+        }
+
+        .login-container {
+            background: var(--panel-bg);
+            border: 1px solid var(--primary-gold);
+            border-radius: 20px;
+            padding: 35px 25px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px var(--gold-glow);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-box .shield {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px auto;
+            border: 2px solid var(--primary-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(197, 160, 89, 0.1);
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .logo-box h1 {
+            color: var(--primary-gold);
+            font-size: 26px;
+            margin: 0;
+        }
+
+        /* الهيكل الرئيسي المتجاوب للهواتف */
+        .app-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(11, 19, 31, 0.98);
+            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        @media (min-width: 768px) {
+            .navbar { flex-direction: row; justify-content: space-between; padding: 12px 30px; }
+        }
+
+        .nav-brand { display: flex; align-items: center; gap: 8px; justify-content: center; }
+        .nav-brand h2 { margin: 0; color: var(--primary-gold); font-size: 18px; }
+
+        .nav-menu {
+            display: flex;
+            gap: 5px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            width: 100%;
+        }
+        .nav-menu::-webkit-scrollbar { display: none; }
+
+        .nav-tab-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: #fff;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0.75;
+        }
+
+        .nav-tab-btn.active {
+            color: var(--primary-gold);
+            background: rgba(197, 160, 89, 0.15);
+            border-color: var(--primary-gold);
+            opacity: 1;
+        }
+
+        .user-status-tag {
+            background: rgba(197, 160, 89, 0.12);
+            border: 1px solid var(--primary-gold);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            align-self: center;
+        }
+
+        .main-container {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .main-container.chat-mode { padding: 0; overflow: hidden; }
+        .page-section { display: none; height: 100%; }
+        .page-section.active { display: block; }
+
+        .panel-box {
+            background: var(--panel-bg);
+            border: 1px solid rgba(197, 160, 89, 0.2);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .panel-box h3 { margin-top: 0; color: var(--primary-gold); font-size: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(197,160,89,0.15); }
+
+        .form-control {
+            width: 100%; padding: 12px; box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(197, 160, 89, 0.25);
+            border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 12px;
+            font-family: inherit;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary-gold); }
+
+        .btn-action {
+            width: 100%; padding: 12px; background: linear-gradient(135deg, var(--primary-gold), #9a7836);
+            border: none; border-radius: 8px; color: #05080c; font-weight: bold; font-size: 13px; cursor: pointer;
+        }
+
+        /* واجهة الدردشة */
+        .chat-view-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: var(--chat-bg);
+            position: relative;
+        }
+
+        .presence-mini-bar {
+            background: #0f1724; border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+            padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;
+            font-size: 12px; cursor: pointer;
+        }
+        .online-dots-flow {
+            display: none; background: #131d2f; padding: 8px; flex-wrap: wrap; gap: 6px;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+        }
+        .online-member-tag {
+            background: rgba(76, 175, 80, 0.15); border: 1px solid var(--success-green);
+            color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 12px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .online-member-tag::before { content: ""; width: 6px; height: 6px; background: var(--success-green); border-radius: 50%; }
+
+        .chat-messages-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+
+        .chat-bubble {
+            max-width: 85%; padding: 10px 12px; border-radius: 14px; font-size: 13.5px;
+            line-height: 1.45; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer;
+        }
+        .chat-bubble.msg-me { background: var(--my-bubble); border-right: 3px solid var(--primary-gold); align-self: flex-start; border-top-right-radius: 2px; }
+        .chat-bubble.msg-other { background: var(--other-bubble); border-right: 3px solid #00bcd4; align-self: flex-end; border-top-left-radius: 2px; }
+
+        .bubble-sender { font-size: 11px; font-weight: bold; color: var(--primary-gold); margin-bottom: 4px; }
+        .chat-bubble.msg-other .bubble-sender { color: #00bcd4; }
+        .bubble-meta { display: flex; justify-content: space-between; align-items: center; font-size: 9px; opacity: 0.5; margin-top: 5px; gap: 10px; }
+        .seen-indicator { color: var(--success-green); font-weight: bold; }
+
+        .chat-delete-btn {
+            position: absolute; left: 8px; top: 6px; background: none; border: none;
+            color: var(--danger-red); font-size: 12px; font-weight: bold; cursor: pointer; display: none;
+        }
+
+        .bubble-reply-preview { background: rgba(0,0,0,0.25); border-right: 2px solid var(--primary-gold); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 6px; opacity: 0.8; }
+        .active-reply-bar { display: none; background: #111a24; border-top: 1px solid var(--primary-gold); padding: 8px 12px; font-size: 12px; justify-content: space-between; align-items: center; }
+
+        .chat-input-area { background: #0b121e; border-top: 1px solid rgba(197, 160, 89, 0.2); padding: 10px; display: flex; gap: 8px; align-items: center; }
+        @supports (padding-bottom: env(safe-area-inset-bottom)) { .chat-input-area { padding-bottom: calc(10px + env(safe-area-inset-bottom)); } }
+
+        /* ميزة تسجيل الصوت */
+        .voice-rec-btn {
+            background: #2c1a1a; border: 1px solid var(--danger-red); border-radius: 50%;
+            width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--danger-red); flex-shrink: 0;
+        }
+        .voice-rec-btn.recording { background: var(--danger-red); color: #fff; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        .chat-audio-player { width: 100%; max-width: 240px; margin-top: 5px; display: block; }
+
+        /* الهوية السيادية */
+        .id-card-wrapper { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; }
+        .id-card {
+            width: 100%; max-width: 400px; aspect-ratio: 1.63 / 1; background: #090f16;
+            border: 1px solid var(--primary-gold); border-radius: 14px; position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; padding: 12px; box-sizing: border-box;
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(197, 160, 89, 0.3); padding-bottom: 4px; }
+        .card-header h4 { margin: 0; font-size: 11px; color: var(--primary-gold); }
+        .card-body-layout { display: flex; justify-content: space-between; height: calc(100% - 45px); margin-top: 5px; }
+        .card-info-pane { width: 70%; display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+        .card-field { display: flex; border-bottom: 1px solid rgba(197, 160, 89, 0.08); padding-bottom: 2px; }
+        .field-lbl { width: 35%; font-size: 9px; color: var(--primary-gold); }
+        .field-val { width: 65%; font-size: 11px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card-photo-pane { width: 25%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .photo-frame { width: 100%; aspect-ratio: 1 / 1.22; border: 1px solid var(--primary-gold); border-radius: 6px; background: #000; overflow: hidden; }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .card-footer { position: absolute; bottom: 6px; left: 12px; right: 12px; display: flex; justify-content: space-between; font-size: 9px; color: var(--primary-gold); }
+        
+        .card-back { display: flex; flex-direction: column; justify-content: space-between; }
+        .qr-zone { display: flex; justify-content: space-between; align-items: center; }
+        .qr-box { background: white; padding: 3px; border-radius: 4px; width: 50px; height: 50px; }
+        .qr-box img { width: 100%; height: 100%; }
+
+        .news-card, .law-item, .post-card, .dept-item, .court-item { background: rgba(255,255,255,0.02); border-right: 3px solid var(--primary-gold); padding: 12px; border-radius: 6px; margin-bottom: 10px; position: relative; }
+        .post-card { border-right: 3px solid #00bcd4; }
+        .court-item { border-right: 3px solid var(--justice-blue); }
+        
+        .remove-btn { position: absolute; top: 10px; left: 10px; background: rgba(255, 82, 82, 0.15); border: 1px solid var(--danger-red); color: var(--danger-red); border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; display: none; }
+
+        /* المرشحين وصندوق الاقتراع المطور بالصور */
+        .candidate-card-box {
+            display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(197,160,89,0.1); padding: 12px; border-radius: 12px; margin-bottom: 10px;
+        }
+        .candidate-avatar { width: 55px; height: 55px; border-radius: 8px; border: 1px solid var(--primary-gold); object-fit: cover; background: #000; }
+        .candidate-details { flex: 1; }
+        .candidate-details h4 { margin: 0 0 4px 0; font-size: 14px; color: #fff; }
+        .candidate-details .votes-count-txt { font-size: 11px; color: var(--primary-gold); }
+
+        .winner-banner-box {
+            background: linear-gradient(135deg, rgba(197,160,89,0.2), rgba(6,10,16,0.9));
+            border: 2px solid var(--primary-gold); border-radius: 12px; padding: 15px;
+            text-align: center; margin-bottom: 15px; box-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .toast-notification { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0b131f; border: 1px solid var(--primary-gold); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: transform 0.3s ease; z-index: 2000; text-align: center; pointer-events: none; }
+        .toast-notification.show { transform: translateX(-50%) translateY(0); }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 850px) { .dashboard-grid { grid-template-columns: 1fr 1fr; } }
+        .video-container { margin-bottom: 15px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(197, 160, 89, 0.2); background: #000; aspect-ratio: 16 / 9; }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <div class="toast-notification" id="appToast"></div>
+
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="logo-box">
+                <div class="shield">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <h1 id="siteMainTitle">بَوَّابَةُ الْفَوَارِسِ</h1>
+                <p id="siteSubTitle">المنظومة السحابية السيادية المركزية</p>
+            </div>
+            <input type="password" id="loginIdInput" class="form-control" placeholder="أدخل رمز الدخول الحزبي" style="text-align:center;">
+            <button class="btn-action" onclick="handleLoginVerify()">امتثال والتحقق الآمن</button>
+        </div>
+    </div>
+
+    <div class="app-layout" id="appLayout" style="display:none;">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c5a059" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <h2 id="navTitle">الأمانة العامة السيادية</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><button class="nav-tab-btn active" onclick="switchPage('newsPage', this)">المستجدات</button></li>
+                <li><button class="nav-tab-btn" onclick="switchPage('chatPage', this)">ديوان الحوار (الشات)</button></li>
+                <li><button class="nav-tab-btn" onclick="switchPage('identityPage', this)">الهوية</button></li>
+                <li><button class="nav-tab-btn" onclick="switchPage('departmentsPage', this)">الأمانة العامة للدوائر</button></li>
+                <li><button class="nav-tab-btn" onclick="switchPage('constitutionPage', this)">الدستور</button></li>
+                <li><button class="nav-tab-btn" onclick="switchPage('courtPage', this)">محكمة الفوارس العليا</button></li>
+                <li><button class="nav-tab-btn" onclick="switchPage('electionsPage', this)">الاقتراع</button></li>
+                <li><button class="nav-tab-btn" id="adminTabBtn" onclick="switchPage('adminPage', this)" style="display:none; color:var(--danger-red); font-weight:bold;">القيادة العليا</button></li>
+            </ul>
+            <div class="user-status-tag" id="userBadgeDisplay">-</div>
+        </nav>
+
+        <div class="main-container" id="mainContainerBox">
+
+            <div class="page-section active" id="newsPage">
+                <div id="mainVideoBox" style="display:none;"><div class="video-container" id="videoWrapper"></div></div>
+                <div class="panel-box" id="memberPostBox" style="display:none;">
+                    <h3>ساحة النشر المطور بالصور</h3>
+                    <textarea id="memberPostContent" class="form-control" rows="2" placeholder="اكتب نص منشورك السيادي هنا..."></textarea>
+                    <input type="text" id="memberPostPhoto" class="form-control" placeholder="رابط صورة مدمجة (اختياري)">
+                    <button class="btn-action" style="background:linear-gradient(135deg, #00bcd4, #00838f); color:white;" onclick="createMemberPostCloud()">نشر الآن على العامة</button>
+                </div>
+                <div class="panel-box">
+                    <h3>المراسيم والتعميمات والمنشورات الموثقة</h3>
+                    <div id="newsFeedBox"></div>
+                </div>
+            </div>
+
+            <div class="page-section" id="chatPage">
+                <div class="chat-view-wrapper">
+                    <div class="presence-mini-bar" onclick="toggleOnlineListFlow()">
+                        <span>🟢 الكوادر المتواجدة حالياً بالمجلس</span>
+                        <span id="onlineCountTxt">اضغط للاستعراض (0) 🔽</span>
+                    </div>
+                    <div class="online-dots-flow" id="onlineUsersBox"></div>
+
+                    <div class="chat-messages-container" id="chatMessagesBox"></div>
+
+                    <div class="active-reply-bar" id="activeReplyBar">
+                        <div style="display:flex; flex-direction:column; gap:2px;">
+                            <span style="color:var(--primary-gold); font-size:11px; font-weight:bold;" id="replyTargetSender">الرد على:</span>
+                            <span id="replyTargetText" style="opacity:0.7; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px;">-</span>
+                        </div>
+                        <button onclick="cancelReplyMode()" style="background:none; border:none; color:var(--danger-red); font-weight:bold; cursor:pointer; font-size:14px;">✕</button>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <button class="voice-rec-btn" id="voiceRecBtn" onclick="toggleVoiceRecordingCloud()">🎙️</button>
+                        <input type="text" id="chatMessageInput" class="form-control" placeholder="اكتب رسالتك السيادية..." style="margin-bottom:0; flex:1;" autocomplete="off">
+                        <button class="btn-action" style="width:75px;" id="chatSendBtn">إرسال</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-section" id="identityPage">
+                <div class="dashboard-grid">
+                    <div class="panel-box">
+                        <h3>وثيقة الانتماء السحابية</h3>
+                        <input type="file" id="idPhotoInput" class="form-control" accept="image/*" onchange="uploadUserImageToServer(event)">
+                        <button class="btn-action" onclick="downloadIdentityCards()">تصدير بطاقة الهوية (وجه + ظهر)</button>
+                    </div>
+                    <div class="panel-box" style="display:flex; flex-direction:column; align-items:center;">
+                        <h3>بطاقة العضوية السيادية</h3>
+                        <div class="id-card-wrapper">
+                            <div class="id-card" id="frontCard">
+                                <div class="card-header">
+                                    <div><h4>جمهورية العراق</h4><p>حزب الفوارس - الأمانة العامة</p></div>
+                                    <div style="text-align:left;"><h4>ALFUARS PARTY</h4></div>
+                                </div>
+                                <div class="card-body-layout">
+                                    <div class="card-info-pane">
+                                        <div class="card-field"><div class="field-lbl">الاسم</div><div class="field-val" id="f_name">-</div></div>
+                                        <div class="card-field"><div class="field-lbl">المنصب</div><div class="field-val" id="f_pos">-</div></div>
+                                        <div class="card-field"><div class="field-lbl">الترخيص</div><div class="field-val" id="f_dept">-</div></div>
+                                        <div class="card-field"><div class="field-lbl">النطاق</div><div class="field-val" id="f_home">-</div></div>
+                                    </div>
+                                    <div class="card-photo-pane">
+                                        <div class="photo-frame"><img id="f_photo" src=""></div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="serial-text" id="f_serial">-</div>
+                                </div>
+                            </div>
+                            <div class="id-card card-back" id="backCard">
+                                <div style="font-size:8px; opacity:0.7;" class="panel-box">يحظر إعارتها أو التلاعب ببياناتها الإلكترونية الرقمية.</div>
+                                <div class="qr-zone">
+                                    <div class="qr-box"><img id="b_qr" src=""></div>
+                                    <div class="card-info-pane" style="width:70%;">
+                                        <div class="card-field"><div class="field-lbl">المواليد</div><div class="field-val" id="b_birth">-</div></div>
+                                        <div class="card-field"><div class="field-lbl">تاريخ النفاذ</div><div class="field-val" id="b_expiry">-</div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-section" id="departmentsPage">
+                <div class="panel-box" id="secGenDeptsAdminBox" style="display:none; border:1px solid var(--primary-gold);">
+                    <h3>إدارة هيكلية الدوائر والمؤسسات (سلطة الأمين العام)</h3>
+                    <input type="text" id="newDeptName" class="form-control" placeholder="اسم الدائرة الجديدة (مثال: دائرة التخطيط)">
+                    <select id="newDeptManager" class="form-control"></select>
+                    <button class="btn-action" onclick="createPartyDepartmentCloud()">تأسيس الدائرة وتعيين المدير</button>
+                    
+                    <hr style="border-color:rgba(197,160,89,0.2); margin:15px 0;">
+                    <h4>إضافة مؤسسة فرعية لدائرة قائمة:</h4>
+                    <select id="targetDeptSelector" class="form-control"></select>
+                    <input type="text" id="newInstitutionName" class="form-control" placeholder="اسم المؤسسة الفرعية">
+                    <button class="btn-action" style="background:#2e7d32; color:white;" onclick="addInstitutionToDeptCloud()">إدراج المؤسسة الفرعية</button>
+                </div>
+
+                <div class="panel-box">
+                    <h3>الهيكل الإداري والدوائر الحزبية العامة</h3>
+                    <div id="departmentsFeedBox"></div>
+                </div>
+            </div>
+
+            <div class="page-section" id="constitutionPage">
+                <div class="panel-box" id="judgeConstitutionAdminBox" style="display:none; border:1px solid var(--editor-purple);">
+                    <h3>منصة التشريع والمواد الدستورية (رئيس مجلس القضاء)</h3>
+                    <input type="text" id="newLawTitle" class="form-control" placeholder="رقم المادة الدستورية أو البند">
+                    <textarea id="newLawContent" class="form-control" rows="2" placeholder="نص المادة التشريعية الملزمة..."></textarea>
+                    <button class="btn-action" style="background:var(--editor-purple); color:white;" onclick="addConstitutionLawCloud()">إصدار وتعميم المادة الدستورية</button>
+                    
+                    <hr style="border-color:rgba(171,71,188,0.2); margin:15px 0;">
+                    <h4>تفويض كاتب بديل للدستور:</h4>
+                    <select id="constitutionDelegatedWriter" class="form-control"></select>
+                    <button class="btn-action" style="background:#e65100; color:white;" onclick="delegateConstitutionWriterCloud()">إصدار التفويض الرسمي</button>
+                </div>
+                <div class="panel-box">
+                    <h3>الدستور الأعلى والنظام الداخلي للحزب</h3>
+                    <div id="constitutionFeedBox"></div>
+                </div>
+            </div>
+
+            <div class="page-section" id="courtPage">
+                <div class="panel-box" id="anyMemberCourtBox">
+                    <h3>تسجيل وتدوين دعوى قضائية بالمحكمة العليا</h3>
+                    <select id="courtAccusedMember" class="form-control"></select>
+                    <textarea id="courtCaseDetails" class="form-control" rows="2" placeholder="تفاصيل وحيثيات الشكوى المرفوعة والمخالفة التنظيمية..."></textarea>
+                    <button class="btn-action" style="background:var(--justice-blue); color:white;" onclick="submitCourtCaseCloud()">رفع الدعوى لسيادة القاضي</button>
+                </div>
+
+                <div class="panel-box">
+                    <h3>سجل القضايا والأحكام الصادرة</h3>
+                    <div id="courtCasesFeedBox"></div>
+                </div>
+            </div>
+
+            <div class="page-section" id="electionsPage">
+                <div id="electionWinnerBox"></div>
+                <div class="dashboard-grid">
+                    <div class="panel-box"><h3 id="electionTitleTxt">صندوق الاقتراع المفتوح</h3><div id="voteOptionsBox"></div></div>
+                    <div class="panel-box"><h3>مركز الفرز المباشر للمجلس</h3><div id="voteResultsBox"></div></div>
+                </div>
+            </div>
+
+            <div class="page-section" id="adminPage">
+                <div class="panel-box" style="border:1px solid var(--primary-gold);">
+                    <h3 id="adminPanelTitle">منظومة القيادة والتدابير العليا</h3>
+                    
+                    <div id="secGeneralTitleEditor" style="display:none; background:rgba(197,160,89,0.1); padding:12px; border-radius:10px; margin-bottom:15px; border:1px solid var(--primary-gold);">
+                        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--primary-gold);">تعديل عناوين البوابة المطلقة والانتخابات:</h4>
+                        <input type="text" id="cfg_site_title" class="form-control" placeholder="عنوان الشاشة الرئيسي">
+                        <input type="text" id="cfg_site_subtitle" class="form-control" placeholder="العنوان الفرعي">
+                        <input type="text" id="cfg_nav_title" class="form-control" placeholder="عنوان شريط التنقل">
+                        <input type="text" id="cfg_election_title" class="form-control" placeholder="عنوان معركة الانتخابات الحالية">
+                        <button class="btn-action" onclick="updateSiteTitlesCloud()">تثبيت وتعميم العناوين</button>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; margin-bottom:15px;">
+                        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--primary-gold);">فيديو الواجهة الرئيسية:</h4>
+                        <input type="text" id="adminVideoUrl" class="form-control" placeholder="رابط فيديو مباشر أو يوتيوب">
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-action" onclick="updateMainVideoCloud()">بث الفيديو</button>
+                            <button class="btn-action" style="background:var(--danger-red); color:white;" onclick="deleteMainVideoCloud()">حذف</button>
+                        </div>
+                    </div>
+
+                    <div id="superAdminSection" style="display:none; background:rgba(171,71,188,0.1); padding:12px; border-radius:10px; margin-bottom:15px; border:1px solid var(--editor-purple);">
+                        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--editor-purple);">تعيين المحرر العام التنفيذي:</h4>
+                        <select id="editorSelector" class="form-control"></select>
+                        <button class="btn-action" style="background:var(--editor-purple); color:white;" onclick="assignEditorCloud()">إصدار تفويض المحرر</button>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; margin-bottom:15px;">
+                        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--primary-gold);">سلطة إدارة وتعديل حقول الهوية والأعضاء:</h4>
+                        <select id="adminMemberSelector" class="form-control" onchange="populateAdminForm()"></select>
+                        <input type="text" id="adm_name" class="form-control" placeholder="الاسم الكامل">
+                        <input type="text" id="adm_pos" class="form-control" placeholder="المنصب الحزبي">
+                        <input type="text" id="adm_home" class="form-control" placeholder="محل السكن (النطاق)">
+                        <input type="text" id="adm_id" class="form-control" placeholder="الرمز السري الموحد">
+                        <input type="text" id="adm_birth" class="form-control" placeholder="المواليد">
+                        <input type="text" id="adm_dept" class="form-control" placeholder="جهة التصدير / الترخيص">
+                        <input type="text" id="adm_dates" class="form-control" placeholder="تاريخ الإصدار / النفاذ">
+                        <input type="text" id="adm_email" class="form-control" placeholder="الهاتف أو البريد">
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-action" onclick="executeAdminUpdateCloud(false)">تحديث القيد الحالي</button>
+                            <button class="btn-action" style="background:#2e7d32; color:white;" onclick="executeAdminUpdateCloud(true)">إدراج كعضو جديد كلياً</button>
+                        </div>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:10px; margin-bottom:15px;">
+                        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--primary-gold);">سلطة إدارة المرشحين وإعلان الفوز:</h4>
+                        <input type="text" id="new_cand_name" class="form-control" placeholder="اسم المرشح بالكامل">
+                        <input type="text" id="new_cand_photo" class="form-control" placeholder="رابط الصورة الشخصية للمرشح">
+                        <button class="btn-action" style="margin-bottom:10px;" onclick="addCandidateCloudMaturity()">إدراج المرشح بالصندوق</button>
+                        
+                        <div style="border-top: 1px solid rgba(197,160,89,0.15); padding-top:10px; margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+                            <button class="btn-action" style="background:#e65100; color:white;" onclick="declareElectionWinnerCloud()">🥇 احتساب وإعلان الفائز بالانتخابات</button>
+                            <button class="btn-action" style="background:var(--danger-red); color:white;" onclick="resetElectionSystemCloud()">🗑️ تصفير الصندوق وإعادة فتح الاقتراع</button>
+                        </div>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:10px;">
+                        <h4 style="margin:0 0 10px 0; font-size:13px; color:var(--danger-red);">العقوبات الإدارية وصلاحيات النشر والشات:</h4>
+                        <select id="pen_target" class="form-control"></select>
+                        <input type="text" id="pen_reason" class="form-control" placeholder="السبب التنظيمي"></input>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn-action btn-danger" onclick="createCommandPenaltyCloud()">تثبيت عقوبة ورقية</button>
+                            <button class="btn-action" style="background:#e65100; color:white;" onclick="togglePostingPermissionCloud(false)">🚫 حظر نشر وشات</button>
+                            <button class="btn-action" style="background:#2e7d32; color:white;" onclick="togglePostingPermissionCloud(true)">✅ فك الحظر</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // الرموز الافتراضية والقيادية السيادية الثابتة
+        const coreSecKey = "530"; 
+        const chiefJudgeKey = "392";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDmbzSfFw6kFKfwBq31EmR8gGd6k-fQ3YQ",
+          authDomain: "alfuars-1c163.firebaseapp.com",
+          databaseURL: "https://alfuars-1c163-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "alfuars-1c163",
+          storageBucket: "alfuars-1c163.firebasestorage.app",
+          messagingSenderId: "1088747369516",
+          appId: "1:1088747369516:web:b5786ea521163fb70a4d89",
+          measurementId: "G-3VDVLBHM80"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let activeDB = {};
+        let candidatesList = {};
+        let newsFeed = [];
+        let lawsList = [];
+        let departmentsList = {};
+        let courtCasesList = {};
+        let activeEditorId = "511"; 
+        let delegatedConstitutionWriter = "";
+
+        let loggedInUser = null;
+        let matchedSerialKey = "";
+        
+        let selectedReplyId = null;
+        let selectedReplyText = "";
+        let selectedReplySender = "";
+
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isAudioRecording = false;
+
+        function showToast(msg) {
+            const toast = document.getElementById('appToast');
+            toast.innerHTML = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // مراقبة المزامنة لبيانات الأعضاء المركزية
+        db.ref('party_master_data').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(!data) return; activeDB = data;
+            
+            if (loggedInUser) {
+                let found = false;
+                for (let k in activeDB) {
+                    if (activeDB[k].id === loggedInUser.id) {
+                        loggedInUser = activeDB[k];
+                        matchedSerialKey = k;
+                        syncIdentityCardFields();
+                        found = true;
+                        break;
+                    }
+                }
+                refreshAdminRolesDisplay();
+                togglePostingUI();
+            }
+            populateSelectBoxesGlobal();
+        });
+
+        // مزامنة عناوين البوابة المطلقة
+        db.ref('site_titles_config').on('value', (snapshot) => {
+            const titles = snapshot.val();
+            if(titles) {
+                if(titles.siteTitle) document.getElementById('siteMainTitle').innerText = titles.siteTitle;
+                if(titles.siteSubtitle) document.getElementById('siteSubTitle').innerText = titles.siteSubtitle;
+                if(titles.navTitle) document.getElementById('navTitle').innerText = titles.navTitle;
+                if(titles.electionTitle) document.getElementById('electionTitleTxt').innerText = titles.electionTitle;
+            }
+        });
+
+        // نظام الحضور الرقمي التزامني
+        setInterval(() => {
+            if(loggedInUser) {
+                db.ref(`online_presence/${loggedInUser.id}`).set({
+                    name: loggedInUser.name, pos: loggedInUser.pos,
+                    lastActive: firebase.database.ServerValue.TIMESTAMP
+                });
+            }
+        }, 10000);
+
+        db.ref('online_presence').on('value', (snapshot) => {
+            const box = document.getElementById('onlineUsersBox');
+            const txt = document.getElementById('onlineCountTxt');
+            box.innerHTML = ""; let count = 0; const now = Date.now();
+
+            snapshot.forEach(child => {
+                const user = child.val();
+                if(now - user.lastActive < 35000) { 
+                    count++;
+                    const tag = document.createElement('div');
+                    tag.className = "online-member-tag";
+                    tag.innerText = `${user.name} (${user.pos})`;
+                    box.appendChild(tag);
+                }
+            });
+            txt.innerText = `اضغط للاستعراض (${count}) 🔽`;
+        });
+
+        function toggleOnlineListFlow() {
+            const box = document.getElementById('onlineUsersBox');
+            box.style.display = (box.style.display === "flex") ? "none" : "flex";
+        }
+
+        // مزامنة بث الفيديو
+        db.ref('main_video_config').on('value', (snapshot) => {
+            const videoUrl = snapshot.val();
+            const videoBox = document.getElementById('mainVideoBox');
+            const wrapper = document.getElementById('videoWrapper');
+            if(videoUrl) {
+                videoBox.style.display = "block";
+                if(videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                    let embedUrl = videoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/");
+                    wrapper.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+                } else {
+                    wrapper.innerHTML = `<video width="100%" height="100%" controls autoplay muted loop src="${videoUrl}"></video>`;
+                }
+            } else { videoBox.style.display = "none"; }
+        });
+
+        // مزامنة الدوائر، القضايا، والمحررين والدستور
+        db.ref('party_departments_data').on('value', (snapshot) => {
+            departmentsList = snapshot.val() || {};
+            if(loggedInUser) renderDepartmentsFeed();
+        });
+
+        db.ref('court_cases_data').on('value', (snapshot) => {
+            courtCasesList = snapshot.val() || {};
+            if(loggedInUser) renderCourtCasesFeed();
+        });
+
+        db.ref('constitution_delegated_writer').on('value', (snapshot) => {
+            delegatedConstitutionWriter = snapshot.val() || "";
+            if(loggedInUser) refreshAdminRolesDisplay();
+        });
+
+        let hasVotedList = {};
+        db.ref('voted_users_registry').on('value', (snapshot) => {
+            hasVotedList = snapshot.val() || {};
+            if(loggedInUser) renderElectionsBox();
+        });
+
+        db.ref('candidates_maturity_data').on('value', (snapshot) => {
+            candidatesList = snapshot.val() || {};
+            if(loggedInUser) renderElectionsBox();
+        });
+
+        db.ref('election_winner_announcement').on('value', (snapshot) => {
+            const winner = snapshot.val();
+            const winBox = document.getElementById('electionWinnerBox');
+            if(winner) {
+                winBox.innerHTML = `<div class="winner-banner-box">
+                    <h2 style="color:var(--primary-gold); margin:0 0 5px 0;">🏆 إعلان نصر واختتام الاقتراع</h2>
+                    <p style="font-size:13px; margin:0;">بناءً على الفرز الإلكتروني المركزي، نعلن فوز المرشح: <strong>${winner.name}</strong> بمجموع أصوات: (${winner.votes} صوت)</p>
+                </div>`;
+            } else { winBox.innerHTML = ""; }
+        });
+
+        db.ref('news_feed').on('value', (snapshot) => {
+            const list = []; snapshot.forEach(c => { let v = c.val(); v.firebaseKey = c.key; list.unshift(v); });
+            newsFeed = list; if(loggedInUser) renderNewsFeed();
+        });
+
+        db.ref('laws_list').on('value', (snapshot) => {
+            const list = []; snapshot.forEach(c => { let v = c.val(); v.firebaseKey = c.key; list.push(v); });
+            lawsList = list; if(loggedInUser) renderLaws();
+        });
+
+        db.ref('active_editor_id').on('value', (snapshot) => {
+            activeEditorId = snapshot.val() || "511";
+            if(loggedInUser) refreshAdminRolesDisplay();
+        });
+
+        // محرك الشات التزامني مع ميزة الحذف الفوري
+        db.ref('sovereign_chat_room').on('value', (snapshot) => {
+            const box = document.getElementById('chatMessagesBox'); box.innerHTML = "";
+            let canDeleteChat = loggedInUser && (loggedInUser.id === coreSecKey || loggedInUser.id === activeEditorId);
+            
+            snapshot.forEach((child) => {
+                const msg = child.val(); const msgKey = child.key;
+
+                if(loggedInUser && (!msg.readers || !msg.readers[loggedInUser.id])) {
+                    db.ref(`sovereign_chat_room/${msgKey}/readers/${loggedInUser.id}`).set(loggedInUser.name);
+                }
+
+                const bubble = document.createElement('div');
+                const isMyMsg = (loggedInUser && msg.senderId === loggedInUser.id);
+                bubble.className = isMyMsg ? "chat-bubble msg-me" : "chat-bubble msg-other";
+                
+                let readersCount = msg.readers ? Object.keys(msg.readers).length : 0;
+                let seenText = `✓ شوهدت (${readersCount})`;
+
+                let replyBlockHtml = "";
+                if(msg.replyToId) {
+                    replyBlockHtml = `<div class="bubble-reply-preview"><strong>↩️ رد على ${msg.replyToSender}:</strong><br>${msg.replyToText}</div>`;
+                }
+
+                let audioBlockHtml = "";
+                if(msg.audioData) {
+                    audioBlockHtml = `<audio controls src="${msg.audioData}" class="chat-audio-player"></audio>`;
+                }
+
+                let deleteBtnHtml = canDeleteChat ? `<button class="chat-delete-btn" style="display:block;" onclick="event.stopPropagation(); deleteChatMessageCloud('${msgKey}')">حذف ✕</button>` : "";
+
+                bubble.innerHTML = `${replyBlockHtml}
+                                    ${deleteBtnHtml}
+                                    <div class="bubble-sender">${msg.senderName} (${msg.senderPos})</div>
+                                    <div class="bubble-body">${msg.text || ''}</div>
+                                    ${audioBlockHtml}
+                                    <div class="bubble-meta">
+                                        <span>${msg.time}</span>
+                                        <span class="seen-indicator" title="${msg.readers ? Object.values(msg.readers).join(' - ') : ''}">${seenText}</span>
+                                    </div>`;
+                
+                bubble.onclick = () => { activateReplyMode(msgKey, msg.senderName, msg.text || "ملف صوتي سيادي"); };
+                box.appendChild(bubble);
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+
+        // دالة حذف رسالة شات
+        function deleteChatMessageCloud(key) {
+            if(confirm("هل تريد حذف هذه الرسالة من ديوان الحوار نهائياً؟")) {
+                db.ref(`sovereign_chat_room/${key}`).remove().then(() => showToast("تم تطهير وحذف الرسالة سحابياً."));
+            }
+        }
+
+        // ميزة التسجيل الصوتي
+        function toggleVoiceRecordingCloud() {
+            const btn = document.getElementById('voiceRecBtn');
+            if(!isAudioRecording) {
+                if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showToast("المتصفح أو الهاتف لا يدعم صلاحية المايكروفون."); return;
+                }
+                navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                        const reader = new FileReader();
+                        reader.onloadend = () => { sendVoiceMessageCloudCore(reader.result); };
+                        reader.readAsDataURL(audioBlob);
+                    };
+                    mediaRecorder.start();
+                    isAudioRecording = true;
+                    btn.classList.add('recording');
+                    showToast("🎙️ جاري تسجيل الصوت السيادي الآن...");
+                }).catch(() => showToast("تعذر الحصول على ترخيص المايكروفون."));
+            } else {
+                if(mediaRecorder) mediaRecorder.stop();
+                isAudioRecording = false;
+                btn.classList.remove('recording');
+                showToast("تم إنهاء التسجيل وجاري الرفع المباشر...");
+            }
+        }
+
+        function sendVoiceMessageCloudCore(base64Audio) {
+            if(loggedInUser.canPost === false) { showToast("🚫 صلاحياتك مجمدة بقرار انضباطي."); return; }
+            const newMsgRef = db.ref('sovereign_chat_room').push();
+            let payload = {
+                senderId: loggedInUser.id, senderName: loggedInUser.name, senderPos: loggedInUser.pos,
+                text: "[🎵 رسالة صوتية مدمجة]", audioData: base64Audio,
+                time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}),
+                readers: {}
+            };
+            payload.readers[loggedInUser.id] = loggedInUser.name;
+            newMsgRef.set(payload);
+        }
+
+        function activateReplyMode(msgId, senderName, text) {
+            selectedReplyId = msgId; selectedReplySender = senderName; selectedReplyText = text;
+            document.getElementById('replyTargetSender').innerText = `الرد على ${senderName}:`;
+            document.getElementById('replyTargetText').innerText = text;
+            document.getElementById('activeReplyBar').style.display = "flex";
+            document.getElementById('chatMessageInput').focus();
+        }
+
+        function cancelReplyMode() {
+            selectedReplyId = null; selectedReplySender = ""; selectedReplyText = "";
+            document.getElementById('activeReplyBar').style.display = "none";
+        }
+
+        function togglePostingUI() {
+            const postBox = document.getElementById('memberPostBox');
+            if(postBox) postBox.style.display = (loggedInUser && loggedInUser.canPost !== false) ? "block" : "none";
+        }
+
+        // إدارة الرتب وعرض الصلاحيات الديناميكية الحصرية
+        function refreshAdminRolesDisplay() {
+            let isSuperAdmin = (loggedInUser.id === coreSecKey);
+            let isEditor = (loggedInUser.id === activeEditorId);
+            let isJudge = (loggedInUser.id === chiefJudgeKey);
+            let isConstitWriter = (loggedInUser.id === delegatedConstitutionWriter);
+
+            // وسم الحالة في الأعلى
+            if (isSuperAdmin) document.getElementById('userBadgeDisplay').innerText = "الأمين العام المطلق";
+            else if (isJudge) document.getElementById('userBadgeDisplay').innerText = "رئيس القضاء الأعلى";
+            else if (isEditor) document.getElementById('userBadgeDisplay').innerText = "محرر معتمد";
+            else document.getElementById('userBadgeDisplay').innerText = `عضو [${loggedInUser.id}]`;
+
+            // التبويب الإداري للقيادة
+            document.getElementById('adminTabBtn').style.display = (isSuperAdmin || isEditor) ? "block" : "none";
+            document.getElementById('secGeneralTitleEditor').style.display = isSuperAdmin ? "block" : "none";
+            document.getElementById('superAdminSection').style.display = isSuperAdmin ? "block" : "none";
+            
+            // لوحة التحكم المخصصة بالدوائر (للأمين العام فقط)
+            document.getElementById('secGenDeptsAdminBox').style.display = isSuperAdmin ? "block" : "none";
+
+            // لوحة الدستور حصرية لرئيس مجلس القضاء بارق محمد 392 أو الكاتب المفوض منه
+            document.getElementById('judgeConstitutionAdminBox').style.display = (isJudge || isConstitWriter) ? "block" : "none";
+
+            if (isSuperAdmin || isEditor) initAdminDashboard(isSuperAdmin);
+        }
+
+        // معالجة وإصلاح دالة تسجيل الدخول لتخطي شاشة الترحيب تماماً
+        function handleLoginVerify() {
+            const inputVal = document.getElementById('loginIdInput').value.trim();
+            let recordFound = null; let currentKey = "";
+            for (const key in activeDB) {
+                if (activeDB[key].id === inputVal) { recordFound = activeDB[key]; currentKey = key; break; }
+            }
+            if (recordFound) {
+                loggedInUser = recordFound; matchedSerialKey = currentKey;
+                showToast("جاري إتمام الاتصال التزامني المشفر.. أهلاً بك.");
+                
+                // إخفاء فوري وقطعي لشاشة الدخول وعرض المنظومة
+                document.getElementById('loginScreen').style.display = "none";
+                document.getElementById('appLayout').style.display = "flex";
+                
+                syncIdentityCardFields();
+                refreshAdminRolesDisplay();
+                togglePostingUI();
+                switchPage('newsPage', document.querySelectorAll('.nav-tab-btn')[0]);
+            } else { showToast("الرمز المدخل غير مسجل برقم سيادي موحد."); }
+        }
+
+        function syncIdentityCardFields() {
+            document.getElementById('f_name').innerText = loggedInUser.name;
+            document.getElementById('f_pos').innerText = loggedInUser.pos;
+            document.getElementById('f_dept').innerText = loggedInUser.dept;
+            document.getElementById('f_home').innerText = loggedInUser.home;
+            document.getElementById('f_serial').innerText = matchedSerialKey;
+            document.getElementById('b_birth').innerText = loggedInUser.birth;
+            document.getElementById('b_expiry').innerText = `${loggedInUser.issue} / ${loggedInUser.expiry}`;
+            document.getElementById('f_photo').src = loggedInUser.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c5a059'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+            document.getElementById('b_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(loggedInUser.name)}`;
+        }
+
+        function uploadUserImageToServer(event) {
+            if(!event.target.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('f_photo').src = reader.result;
+                db.ref(`party_master_data/${matchedSerialKey}/photo`).set(reader.result).then(() => { showToast("تم حفظ وتأمين الصورة الشخصية سحابياً."); });
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active'); element.classList.add('active');
+
+            const container = document.getElementById('mainContainerBox');
+            if(pageId === 'chatPage') {
+                container.classList.add('chat-mode');
+                document.getElementById('chatMessagesBox').scrollTop = document.getElementById('chatMessagesBox').scrollHeight;
+            } else { container.classList.remove('chat-mode'); }
+        }
+
+        const chatInput = document.getElementById('chatMessageInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+
+        function sendChatMessageCloudCore() {
+            const text = chatInput.value.trim(); if(!text) return;
+            if(loggedInUser.canPost === false) { showToast("🚫 نأسف، لقد تم تجميد صلاحية النشر الخاصة بك."); return; }
+
+            const newMsgRef = db.ref('sovereign_chat_room').push();
+            let msgPayload = {
+                senderId: loggedInUser.id, senderName: loggedInUser.name, senderPos: loggedInUser.pos,
+                text: text, time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}),
+                readers: {}
+            };
+            if(selectedReplyId) {
+                msgPayload.replyToId = selectedReplyId; msgPayload.replyToSender = selectedReplySender; msgPayload.replyToText = selectedReplyText;
+            }
+            msgPayload.readers[loggedInUser.id] = loggedInUser.name;
+            newMsgRef.set(msgPayload).then(() => { chatInput.value = ""; cancelReplyMode(); chatInput.focus(); });
+        }
+
+        chatSendBtn.addEventListener('click', sendChatMessageCloudCore);
+        chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendChatMessageCloudCore(); });
+
+        // ميزة النشر المتطور (كلام وصور مدمجة) في ساحة المستجدات
+        function createMemberPostCloud() {
+            const content = document.getElementById('memberPostContent').value.trim();
+            const photoUrl = document.getElementById('memberPostPhoto').value.trim();
+            if(!content || loggedInUser.canPost === false) return;
+            
+            db.ref('news_feed').push().set({
+                title: `منشور بواسطة الكادر: ${loggedInUser.name}`, 
+                content: content, 
+                photo: photoUrl || null,
+                date: "اليوم", 
+                isMemberPost: true
+            }).then(() => { 
+                document.getElementById('memberPostContent').value = ""; 
+                document.getElementById('memberPostPhoto').value = ""; 
+                showToast("تم بث المنشور المطور إلى ساحة العامة.");
+            });
+        }
+
+        // وظائف الأمانة العامة لإدارة وتخصيص الدوائر والمؤسسات
+        function createPartyDepartmentCloud() {
+            const deptName = document.getElementById('newDeptName').value.trim();
+            const managerKey = document.getElementById('newDeptManager').value;
+            if(!deptName || !managerKey) { showToast("يرجى ملء البيانات لتأسيس الدائرة."); return; }
+            
+            const manager = activeDB[managerKey];
+            db.ref('party_departments_data').push().set({
+                name: deptName,
+                managerName: manager.name,
+                managerId: manager.id,
+                institutions: ""
+            }).then(() => {
+                document.getElementById('newDeptName').value = "";
+                showToast(`تم تأسيس ${deptName} بنجاح.`);
+            });
+        }
+
+        function addInstitutionToDeptCloud() {
+            const deptKey = document.getElementById('targetDeptSelector').value;
+            const instName = document.getElementById('newInstitutionName').value.trim();
+            if(!deptKey || !instName) { showToast("الحقول ناقصة."); return; }
+
+            db.ref(`party_departments_data/${deptKey}/institutions`).push().set({
+                name: instName
+            }).then(() => {
+                document.getElementById('newInstitutionName').value = "";
+                showToast(`تم إدراج مؤسسة ${instName} في الدائرة.`);
+            });
+        }
+
+        function removeDepartmentElementCloud(key) {
+            if(confirm("هل تريد حذف هذه الدائرة؟")) { db.ref(`party_departments_data/${key}`).remove(); }
+        }
+        function removeInstitutionElementCloud(deptKey, instKey) {
+            if(confirm("هل تريد حذف هذه المؤسسة؟")) { db.ref(`party_departments_data/${deptKey}/institutions/${instKey}`).remove(); }
+        }
+
+        function renderDepartmentsFeed() {
+            const container = document.getElementById('departmentsFeedBox'); container.innerHTML = "";
+            let isSecGen = loggedInUser && loggedInUser.id === coreSecKey;
+
+            for (let key in departmentsList) {
+                const dept = departmentsList[key];
+                const block = document.createElement('div'); block.className = "dept-item";
+                
+                let instHtml = "<ul style='padding-right:20px; font-size:12px; color:var(--primary-gold);'>";
+                if(dept.institutions) {
+                    for(let instKey in dept.institutions) {
+                        let delInstBtn = isSecGen ? ` <span style="color:var(--danger-red); cursor:pointer;" onclick="removeInstitutionElementCloud('${key}','${instKey}')">[حذف]</span>` : "";
+                        instHtml += `<li>🏛️ ${dept.institutions[instKey].name} ${delInstBtn}</li>`;
+                    }
+                }
+                instHtml += "</ul>";
+
+                let delDeptBtn = isSecGen ? `<button class="remove-btn" style="display:block;" onclick="removeDepartmentElementCloud('${key}')">حذف الدائرة</button>` : "";
+
+                block.innerHTML = `<strong>💼 الدائرة: ${dept.name}</strong><br>
+                                   <span style="font-size:11px; opacity:0.8;">👤 المدير المسؤول: ${dept.managerName} (رقم الحساب: ${dept.managerId})</span><br>
+                                   <div style="margin-top:5px;">📋 المؤسسات التابعة لها:</div>
+                                   ${instHtml}
+                                   ${delDeptBtn}`;
+                container.appendChild(block);
+            }
+        }
+
+        // التشريع الدستوري وتفويض الكتاب (حصر الصلاحية ببارق محمد 392)
+        function addConstitutionLawCloud() {
+            const title = document.getElementById('newLawTitle').value.trim();
+            const content = document.getElementById('newLawContent').value.trim();
+            if(!title || !content) { showToast("الرجاء إدخال الحقول كاملة."); return; }
+            db.ref('laws_list').push().set({ title: title, content: content }).then(() => {
+                document.getElementById('newLawTitle').value = "";
+                document.getElementById('newLawContent').value = "";
+                showToast("تم تشريع المادة الدستورية بنجاح.");
+            });
+        }
+
+        function delegateConstitutionWriterCloud() {
+            const targetId = document.getElementById('constitutionDelegatedWriter').value;
+            db.ref('constitution_delegated_writer').set(targetId).then(() => {
+                showToast("تم إصدار تفويض كاتب الدستور بنجاح.");
+            });
+        }
+
+        // محكمة الفوارس العليا (القاضي بارق محمد 392 وبث الأحكام)
+        function submitCourtCaseCloud() {
+            const accusedKey = document.getElementById('courtAccusedMember').value;
+            const details = document.getElementById('courtCaseDetails').value.trim();
+            if(!accusedKey || !details) { showToast("يرجى ملء حقول الدعوى القضائية."); return; }
+
+            const accused = activeDB[accusedKey];
+            db.ref('court_cases_data').push().set({
+                plaintiffName: loggedInUser.name,
+                plaintiffId: loggedInUser.id,
+                accusedName: accused.name,
+                accusedId: accused.id,
+                details: details,
+                ruling: "قيد المراجعة والمداولة القضائية من قبل سيادة القاضي بارق محمد"
+            }).then(() => {
+                document.getElementById('courtCaseDetails').value = "";
+                showToast("تم تسجيل الدعوى بشكل رسمي لدى سجل المحكمة العليا.");
+            });
+        }
+
+        function castCourtRulingCloud(caseKey, inputId) {
+            const rulingText = document.getElementById(inputId).value.trim();
+            if(!rulingText) return;
+            db.ref(`court_cases_data/${caseKey}/ruling`).set(rulingText).then(() => {
+                showToast("تم النطق بالاصدار والحكم القضائي المبرم.");
+            });
+        }
+
+        function removeCourtCaseCloud(key) {
+            if(confirm("هل تريد إزالة هذه الدعوى من السجلات؟")) { db.ref(`court_cases_data/${key}`).remove(); }
+        }
+
+        function renderCourtCasesFeed() {
+            const container = document.getElementById('courtCasesFeedBox'); container.innerHTML = "";
+            let isJudge = loggedInUser && loggedInUser.id === chiefJudgeKey;
+
+            for(let key in courtCasesList) {
+                const c = courtCasesList[key];
+                const item = document.createElement('div'); item.className = "court-item";
+                
+                let rulingControl = "";
+                if(isJudge) {
+                    rulingControl = `<div style="margin-top:10px; background:rgba(0,0,0,0.2); padding:8px; border-radius:6px;">
+                                        <input type="text" id="judge_input_${key}" class="form-control" placeholder="اكتب منطوق الحكم القضائي البات...">
+                                        <button class="btn-action" style="background:var(--justice-blue); color:white; padding:6px;" onclick="castCourtRulingCloud('${key}', 'judge_input_${key}')">إصدار الحكم ونشره</button>
+                                     </div>
+                                     <button class="remove-btn" style="display:block;" onclick="removeCourtCaseCloud('${key}')">شطب الدعوى</button>`;
+                }
+
+                item.innerHTML = `⚖️ <strong>قضية رقم: ${key.substring(1,6)}</strong><br>
+                                  <span style="color:#00bcd4;">👤 المشتكي:</span> ${c.plaintiffName} [${c.plaintiffId}]<br>
+                                  <span style="color:var(--danger-red);">🛑 المذنب/المدعى عليه:</span> ${c.accusedName} [${c.accusedId}]<br>
+                                  <p style="background:rgba(0,0,0,0.3); padding:8px; border-radius:4px; margin:5px 0;">📝 تفاصيل المخالفة: ${c.details}</p>
+                                  <div style="border-right: 2px solid var(--success-green); padding-right:8px; font-weight:bold;">
+                                    📢 الحكم الصادر: <span style="color:var(--text-light);">${c.ruling}</span>
+                                  </div>
+                                  ${rulingControl}`;
+                container.appendChild(item);
+            }
+        }
+
+        // دوال التحديث والتعميم للأمين العام 530
+        function updateSiteTitlesCloud() {
+            if(loggedInUser.id !== coreSecKey) return;
+            db.ref('site_titles_config').update({
+                siteTitle: document.getElementById('cfg_site_title').value.trim(),
+                siteSubtitle: document.getElementById('cfg_site_subtitle').value.trim(),
+                navTitle: document.getElementById('cfg_nav_title').value.trim(),
+                electionTitle: document.getElementById('cfg_election_title').value.trim()
+            }).then(() => { showToast("تم تعميم وسلطة العناوين بنجاح."); });
+        }
+
+        function updateMainVideoCloud() { db.ref('main_video_config').set(document.getElementById('adminVideoUrl').value.trim()); }
+        function deleteMainVideoCloud() { db.ref('main_video_config').remove(); }
+
+        function renderNewsFeed() {
+            const container = document.getElementById('newsFeedBox'); container.innerHTML = "";
+            let canRemove = (loggedInUser.id === coreSecKey || loggedInUser.id === activeEditorId);
+            newsFeed.forEach(item => {
+                const card = document.createElement('div'); card.className = item.isMemberPost ? "post-card" : "news-card";
+                let imgHtml = item.photo ? `<img src="${item.photo}" style="width:100%; max-height:220px; object-fit:cover; border-radius:8px; margin-top:8px; border:1px solid rgba(197,160,89,0.3);">` : "";
+                
+                card.innerHTML = `<div class="date">${item.date}</div><strong>${item.title}</strong><p>${item.content}</p>${imgHtml}`;
+                if (canRemove) card.innerHTML += `<button class="remove-btn" style="display:block;" onclick="removeNewsElementCloud('${item.firebaseKey}')">حذف</button>`;
+                container.appendChild(card);
+            });
+        }
+
+        function renderLaws() {
+            const container = document.getElementById('constitutionFeedBox'); container.innerHTML = "";
+            let canRemove = (loggedInUser.id === coreSecKey || loggedInUser.id === chiefJudgeKey || loggedInUser.id === delegatedConstitutionWriter);
+            lawsList.forEach(item => {
+                const block = document.createElement('div'); block.className = "law-item";
+                block.innerHTML = `<strong>${item.title}</strong><br><span>${item.content}</span>`;
+                if (canRemove) block.innerHTML += `<button class="remove-btn" style="display:block;" onclick="removeLawElementCloud('${item.firebaseKey}')">حذف</button>`;
+                container.appendChild(block);
+            });
+        }
+
+        function renderElectionsBox() {
+            const optionsBox = document.getElementById('voteOptionsBox'); const resultsBox = document.getElementById('voteResultsBox');
+            optionsBox.innerHTML = ""; resultsBox.innerHTML = "";
+            let userHasVoted = hasVotedList[loggedInUser.id] || false;
+
+            for (const key in candidatesList) {
+                const cand = candidatesList[key];
+                
+                const optionCard = document.createElement('div'); optionCard.className = "candidate-card-box";
+                let btnHtml = userHasVoted ? `<button class="btn-action" style="background:#333; width:90px;" disabled>تم التصويت</button>` : `<button class="btn-action" style="width:90px;" onclick="castVoteCloudMaturity('${key}')">اقتراع صريح</button>`;
+                optionCard.innerHTML = `<img src="${cand.photo || 'https://via.placeholder.com/150'}" class="candidate-avatar">
+                                        <div class="candidate-details"><h4>${cand.name}</h4></div>
+                                        <div>${btnHtml}</div>`;
+                optionsBox.appendChild(optionCard);
+
+                const resultCard = document.createElement('div'); resultCard.className = "candidate-card-box";
+                resultCard.innerHTML = `<img src="${cand.photo || 'https://via.placeholder.com/150'}" class="candidate-avatar">
+                                        <div class="candidate-details">
+                                            <h4>${cand.name}</h4>
+                                            <div class="votes-count-txt">مجموع الأصوات المحصودة: <strong>${cand.votes || 0} صوتاً</strong></div>
+                                        </div>`;
+                resultsBox.appendChild(resultCard);
+            }
+        }
+
+        function castVoteCloudMaturity(candKey) {
+            if(hasVotedList[loggedInUser.id]) { showToast("مرفوض! لقد مارست حقك الانتخابي لمرة واحدة كعضو موحد."); return; }
+            db.ref(`voted_users_registry/${loggedInUser.id}`).set(true).then(() => {
+                db.ref(`candidates_maturity_data/${candKey}/votes`).transaction(v => (v || 0) + 1);
+                showToast("تم تسجيل صوتك بنجاح في صندوق الاقتراع السحابي الموحد.");
+            });
+        }
+
+        function addCandidateCloudMaturity() {
+            const name = document.getElementById('new_cand_name').value.trim();
+            const photo = document.getElementById('new_cand_photo').value.trim();
+            if(!name) return;
+            db.ref('candidates_maturity_data').push().set({ name: name, photo: photo, votes: 0 }).then(() => {
+                document.getElementById('new_cand_name').value = "";
+                document.getElementById('new_cand_photo').value = "";
+                showToast("تم إدراج المرشح الجديد مرفقاً ببيانات الهوية البصرية.");
+            });
+        }
+
+        function declareElectionWinnerCloud() {
+            let maxVotes = -1; let winnerCand = null;
+            for(let key in candidatesList) {
+                if(candidatesList[key].votes > maxVotes) {
+                    maxVotes = candidatesList[key].votes; winnerCand = candidatesList[key];
+                }
+            }
+            if(winnerCand) {
+                db.ref('election_winner_announcement').set({ name: winnerCand.name, votes: maxVotes }).then(() => {
+                    showToast("تم احتساب النتائج وإعلان فوز القائد المنتخب.");
+                });
+            } else { showToast("لا يوجد مرشحين بالصندوق لفرزهم."); }
+        }
+
+        function resetElectionSystemCloud() {
+            if(confirm("هل أنت متأكد من تصفير وإعادة تهيئة نظام الانتخابات؟")) {
+                db.ref('candidates_maturity_data').remove();
+                db.ref('voted_users_registry').remove();
+                db.ref('election_winner_announcement').remove().then(() => showToast("تم تصفير الصناديق وفتح باب الاقتراع من جديد."));
+            }
+        }
+
+        // تعبئة وتحديث صناديق الاختيار على نطاق المنظومة بالكامل
+        function populateSelectBoxesGlobal() {
+            const managerSel = document.getElementById('newDeptManager');
+            const targetDeptSel = document.getElementById('targetDeptSelector');
+            const writerSel = document.getElementById('constitutionDelegatedWriter');
+            const accusedSel = document.getElementById('courtAccusedMember');
+
+            if(managerSel) managerSel.innerHTML = "";
+            if(targetDeptSel) targetDeptSel.innerHTML = "";
+            if(writerSel) writerSel.innerHTML = "";
+            if(accusedSel) accusedSel.innerHTML = "";
+
+            for (const key in activeDB) {
+                let m = activeDB[key];
+                
+                let opt = document.createElement('option'); opt.value = key; opt.innerText = m.name;
+                if(managerSel) managerSel.appendChild(opt);
+
+                let opt2 = document.createElement('option'); opt2.value = m.id; opt2.innerText = m.name;
+                if(writerSel) writerSel.appendChild(opt2);
+
+                let opt3 = document.createElement('option'); opt3.value = key; opt3.innerText = m.name;
+                if(accusedSel) accusedSel.appendChild(opt3);
+            }
+
+            for(const dKey in departmentsList) {
+                let optD = document.createElement('option'); optD.value = dKey; optD.innerText = departmentsList[dKey].name;
+                if(targetDeptSel) targetDeptSel.appendChild(optD);
+            }
+        }
+
+        function initAdminDashboard(isSuperAdmin) {
+            const selector = document.getElementById('adminMemberSelector');
+            const targetPen = document.getElementById('pen_target');
+            const editorSel = document.getElementById('editorSelector');
+            
+            selector.innerHTML = "<option value=''>-- اختر قيد العضو للتعديل --</option>";
+            targetPen.innerHTML = ""; if(editorSel) editorSel.innerHTML = "";
+            
+            if(isSuperAdmin) {
+                document.getElementById('adminPanelTitle').innerText = "القيادة العليا السيادية (الأمين العام)";
+            }
+            for (const key in activeDB) {
+                let opt = document.createElement('option'); opt.value = key; opt.innerText = activeDB[key].name;
+                selector.appendChild(opt);
+                let opt2 = document.createElement('option'); opt2.value = key; opt2.innerText = activeDB[key].name;
+                targetPen.appendChild(opt2);
+                if (isSuperAdmin && editorSel) {
+                    let opt3 = document.createElement('option'); opt3.value = activeDB[key].id; opt3.innerText = activeDB[key].name;
+                    editorSel.appendChild(opt3);
+                }
+            }
+        }
+
+        function togglePostingPermissionCloud(isAllowed) {
+            const targetKey = document.getElementById('pen_target').value; if(!targetKey) return;
+            db.ref(`party_master_data/${targetKey}/canPost`).set(isAllowed).then(() => { showToast("تم تحديث صلاحيات الكادر بنجاح."); });
+        }
+
+        function createCommandPenaltyCloud() {
+            const targetKey = document.getElementById('pen_target').value;
+            const reason = document.getElementById('pen_reason').value.trim();
+            if(!reason || !targetKey) return;
+            const targetName = activeDB[targetKey].name;
+            db.ref('news_feed').push().set({
+                title: `إجراء وعقوبة انضباطية عليا`, content: `تقرر إيقاع تنبيه وجزاء ورقي ضد الكادر [${targetName}] للسبب: ${reason}`, date: "اليوم", isMemberPost: false
+            }).then(() => { document.getElementById('pen_reason').value = ""; showToast("تم التثبيت العام."); });
+        }
+
+        function assignEditorCloud() { db.ref('active_editor_id').set(document.getElementById('editorSelector').value); }
+
+        function populateAdminForm() {
+            const key = document.getElementById('adminMemberSelector').value; if (!key) return;
+            const mem = activeDB[key];
+            document.getElementById('adm_name').value = mem.name || '';
+            document.getElementById('adm_pos').value = mem.pos || '';
+            document.getElementById('adm_home').value = mem.home || '';
+            document.getElementById('adm_id').value = mem.id || '';
+            document.getElementById('adm_birth').value = mem.birth || '';
+            document.getElementById('adm_dept').value = mem.dept || '';
+            document.getElementById('adm_dates').value = `${mem.issue || ''} / ${mem.expiry || ''}`;
+            document.getElementById('adm_email').value = mem.email || "";
+        }
+
+        function executeAdminUpdateCloud(isNewMember) {
+            const currentKey = document.getElementById('adminMemberSelector').value;
+            let dateParts = document.getElementById('adm_dates').value.split('/');
+            let memberData = {
+                id: document.getElementById('adm_id').value.trim(),
+                name: document.getElementById('adm_name').value.trim(),
+                pos: document.getElementById('adm_pos').value.trim(),
+                home: document.getElementById('adm_home').value.trim(),
+                birth: document.getElementById('adm_birth').value.trim(),
+                dept: document.getElementById('adm_dept').value.trim(),
+                issue: dateParts[0] ? dateParts[0].trim() : "2026-05-16",
+                expiry: dateParts[1] ? dateParts[1].trim() : "2028-05-20",
+                email: document.getElementById('adm_email').value.trim(),
+                canPost: isNewMember ? true : activeDB[currentKey].canPost
+            };
+            if(!isNewMember && activeDB[currentKey].photo) memberData.photo = activeDB[currentKey].photo;
+            let k = isNewMember ? `${memberData.id}-MEMBER-${Math.floor(100+Math.random()*900)}` : currentKey;
+            db.ref(`party_master_data/${k}`).set(memberData).then(() => { showToast("تم المزامنة والتحديث المركزي للحقول."); });
+        }
+
+        function removeNewsElementCloud(fbKey) { db.ref(`news_feed/${fbKey}`).remove(); }
+        function removeLawElementCloud(fbKey) { db.ref(`laws_list/${fbKey}`).remove(); }
+
+        // آلية تصدير الهوية الذكية المتتابعة بجودة كاملة لحفظ البطاقتين
+        function downloadIdentityCards() {
+            showToast("جاري تصدير وجه الهوية...");
+            html2canvas(document.getElementById('frontCard'), { scale: 3, useCORS: true }).then(canvasF => {
+                let link = document.createElement('a'); link.download = `هوية_الفوارس_وجه.png`; link.href = canvasF.toDataURL('image/png'); link.click();
+                
+                setTimeout(() => {
+                    showToast("جاري تصدير ظهر الهوية...");
+                    html2canvas(document.getElementById('backCard'), { scale: 3, useCORS: true }).then(canvasB => {
+                        let linkB = document.createElement('a'); linkB.download = `هوية_الفوارس_ظهر.png`; linkB.href = canvasB.toDataURL('image/png'); linkB.click();
+                    });
+                }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>
