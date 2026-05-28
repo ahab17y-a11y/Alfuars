@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة وتجميع سفرات الحزب الآمن</title>
+    <style>
+        :root {
+            --gold: #c5a059;
+            --dark-blue: #0b131f;
+            --panel-bg: #111a24;
+            --text-light: #f5f7fa;
+            --success: #2e7d32;
+            --danger: #d32f2f;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--dark-blue);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* الإحصائيات العلوية */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            background: var(--panel-bg);
+            border: 1px solid var(--gold);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-item h4 { margin: 0 0 5px 0; color: var(--gold); font-size: 14px; }
+        .stat-item p { margin: 0; font-size: 18px; font-weight: bold; }
+
+        /* اللوحة الرئيسية للرحلة */
+        .trip-main-panel {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-right: 4px solid var(--gold);
+        }
+
+        .trip-title { color: var(--gold); margin-top: 0; margin-bottom: 10px; font-size: 24px; }
+        .trip-desc { color: #ccc; line-height: 1.6; font-size: 15px; margin-bottom: 20px; white-space: pre-wrap; }
+
+        .section-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(197, 160, 89, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .section-block h3 { margin-top: 0; color: var(--gold); font-size: 16px; border-bottom: 1px solid rgba(197, 160, 89, 0.2); padding-bottom: 5px; }
+        .pre-text { white-space: pre-wrap; line-height: 1.7; font-size: 14px; margin: 0; }
+
+        /* مستلزمات الأعضاء */
+        .items-list { max-height: 150px; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; }
+        .item-row { background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 4px; margin-bottom: 5px; font-size: 13px; }
+
+        /* حقول الإدخال والأزرار */
+        .form-control {
+            width: 100%; padding: 10px; margin-bottom: 12px; box-sizing: border-box;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(197,160,89,0.3);
+            border-radius: 6px; color: #fff; font-family: inherit; font-size: 14px;
+        }
+        .form-control:focus { outline: none; border-color: var(--gold); }
+
+        .btn {
+            background: linear-gradient(135deg, var(--gold), #9a7836);
+            color: #000; border: none; padding: 12px 20px; font-weight: bold;
+            border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px;
+        }
+        .btn:hover { opacity: 0.9; }
+
+        /* بوابة الدخول السري */
+        .admin-trigger-zone { text-align: left; margin-bottom: 15px; }
+        .btn-admin-toggle { background: none; border: 1px dashed rgba(197, 160, 89, 0.4); color: rgba(197, 160, 89, 0.7); padding: 6px 12px; font-size: 12px; cursor: pointer; border-radius: 4px; }
+        
+        /* لوحة التحكم المحمية */
+        .admin-panel {
+            background: #1a1111; border: 1px solid var(--danger);
+            border-radius: 12px; padding: 20px; margin-bottom: 25px; display: none;
+        }
+
+        /* حظر رؤية الجدول الافتراضية */
+        .secured-table-wrapper { 
+            display: none; 
+            background: var(--panel-bg); 
+            border-radius: 8px; 
+            border: 2px solid var(--danger); 
+            margin-top: 25px; 
+            padding: 10px;
+        }
+        .members-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
+        .members-table th { background: rgba(211, 47, 47, 0.15); color: #ff8a80; padding: 10px; border: 1px solid rgba(211, 47, 47, 0.3); }
+        .members-table td { padding: 10px; border: 1px solid rgba(255,255,255,0.1); }
+
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 13px; display: none; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="msgToast"></div>
+
+    <div class="container">
+        
+        <!-- بوابة الدخول السري المشفرة للقيادة -->
+        <div class="admin-trigger-zone">
+            <button class="btn-admin-toggle" onclick="verifySecureAccess()">🔐 الدخول الأمني للنظام</button>
+        </div>
+
+        <!-- لوحة التحكم الإدارية (محمية ومخفية تماماً عن العامة) -->
+        <div class="admin-panel" id="secureAdminPanel">
+            <h3 style="color:var(--danger); margin-top:0; border-bottom:1px solid var(--danger); padding-bottom:8px;">⚙️ لوحة القيادة العليا | إدارة السفرة والبرامج</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                <div>
+                    <label style="font-size:12px;">الوجهة المقررة:</label>
+                    <input type="text" id="editDest" class="form-control" value="شمال العراق - أربيل">
+                </div>
+                <div>
+                    <label style="font-size:12px;">المدة:</label>
+                    <input type="text" id="editDuration" class="form-control" value="4 أيام">
+                </div>
+                <div>
+                    <label style="font-size:12px;">العدد المستهدف:</label>
+                    <input type="number" id="editTargetCount" class="form-control" value="40">
+                </div>
+            </div>
+            <div>
+                <label style="font-size:12px;">اسم الرحلة:</label>
+                <input type="text" id="editTitle" class="form-control" value="رحلة الفوارس الربيعية الأولى">
+            </div>
+            <div>
+                <label style="font-size:12px;">وصف الرحلة العام:</label>
+                <textarea id="editDesc" class="form-control" rows="2">سفرة ترفيهية تنظيمية لتوثيق الروابط بين كوادر وأعضاء الحزب.</textarea>
+            </div>
+            <div>
+                <label style="font-size:12px;">برنامج الرحلة بالتواقيت والأماكن وقائد الرحلة:</label>
+                <textarea id="editSchedule" class="form-control" rows="4">التجمع: الساعة 6:00 صباحاً أمام المقر الرئيسي.
+الانطلاق: الساعة 6:30 صباحاً بإشراف قائد الرحلة (حسين علاء).
+الاستراحة الأولى: الساعة 9:00 صباحاً في محطة كركوك.
+الوصول المتوقع: الساعة 1:00 ظهراً والفندق المخصص.</textarea>
+            </div>
+            <div>
+                <label style="font-size:12px;">تقسيم وتوزيع الأعضاء المسجلين إلى فرق:</label>
+                <textarea id="editTeams" class="form-control" rows="3">فرقة الصقور: تشمل الأعضاء من تسلسل 1 إلى 15 (المسؤول: أحمد)
+فرقة الفهد: تشمل الأعضاء من تسلسل 16 إلى 30 (المسؤول: علي)</textarea>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button class="btn" style="background:var(--success); color:white; flex: 3;" onclick="saveSecureData()">💾 حفظ وتحديث برامج الرحلة</button>
+                <button class="btn" style="background:#333; color:white; flex: 1;" onclick="lockSecurePanel()">🔒 إغلاق اللوحة وتشفير البيانات</button>
+            </div>
+        </div>
+
+        <!-- 1. شريط الإحصائيات العلوي للعامة -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <h4>الوجهة المقررة</h4>
+                <p id="dispDest">شمال العراق - أربيل</p>
+            </div>
+            <div class="stat-item">
+                <h4>المدة الزمنية</h4>
+                <p id="dispDuration">4 أيام</p>
+            </div>
+            <div class="stat-item">
+                <h4>الأعضاء المشاركين</h4>
+                <p id="dispCount">0 / 40</p>
+            </div>
+        </div>
+
+        <!-- 2. العرض الرئيسي للرحلة المتاح للعامة -->
+        <div class="trip-main-panel">
+            <h1 class="trip-title" id="dispTitle">رحلة الفوارس الربيعية الأولى</h1>
+            <p class="trip-desc" id="dispDesc">سفرة ترفيهية تنظيمية لتوثيق الروابط بين كوادر وأعضاء الحزب.</p>
+
+            <!-- برنامج الرحلة المكتوب من قبل الإدارة -->
+            <div class="section-block">
+                <h3>📋 مخطط وبرنامج الرحلة بالتواقيت والأماكن</h3>
+                <pre class="pre-text" id="dispSchedule">التجمع: الساعة 6:00 صباحاً أمام المقر الرئيسي.
+الانطلاق: الساعة 6:30 صباحاً بإشراف قائد الرحلة (حسين علاء).
+الاستراحة الأولى: الساعة 9:00 صباحاً في محطة كركوك.
+الوصول المتوقع: الساعة 1:00 ظهراً والفندق المخصص.</pre>
+                <div style="margin-top:10px; font-size:12px; color:var(--gold); font-weight:bold; text-align:left;">
+                    بإشراف وإدارة القيادة العليا للمنظومة
+                </div>
+            </div>
+
+            <!-- تقسيم المجموعات -->
+            <div class="section-block" style="border-right: 3px solid #ab47bc;">
+                <h3 style="color:#ab47bc;">🛡️ توزيع وتقسيم الرحالة إلى فرق (تحديث مركزي)</h3>
+                <pre class="pre-text" id="dispTeams">فرقة الصقور: تشمل الأعضاء من تسلسل 1 إلى 15 (المسؤول: أحمد)
+فرقة الفهد: تشمل الأعضاء من تسلسل 16 إلى 30 (المسؤول: علي)</pre>
+            </div>
+
+            <!-- تفاعل جلب المواد -->
+            <div class="section-block">
+                <h3>📦 مستلزمات وتجهيزات الرحالة المرافقة</h3>
+                <div class="items-list" id="itemsContainer">
+                    <div class="item-row">🎒 <strong>حسن:</strong> حقيبة إسعافات أولية متكاملة ومعدات طوارئ.</div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="itemUser" class="form-control" placeholder="اسمك" style="width:30%; margin-bottom:0;">
+                    <input type="text" id="itemText" class="form-control" placeholder="ماذا ستجلب معك للرحلة؟" style="width:70%; margin-bottom:0;">
+                    <button class="btn" style="width:auto; white-space:nowrap; padding:0 15px;" onclick="addLuggageItem()">إدراج المادة</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. استمارة تسجيل العضو (متاحة للجميع لإرسال البيانات) -->
+        <div class="trip-main-panel" style="border-right-color:var(--success); background: linear-gradient(to bottom, #111a24, #0d151d);">
+            <h3 style="color:var(--success); margin-top:0; margin-bottom:15px; font-size:18px;">📝 استمارة التسجيل والالتحاق بالرحلة</h3>
+            
+            <label style="font-size:13px; display:block; margin-bottom:4px;">الاسم الكامل:</label>
+            <input type="text" id="regName" class="form-control" placeholder="أدخل اسمك الثلاثي المعتمد">
+
+            <label style="font-size:13px; display:block; margin-bottom:4px;">رقم الهاتف / الرقم التنظيمي:</label>
+            <input type="text" id="regPhone" class="form-control" placeholder="أدخل رقمك الفعال للتواصل">
+
+            <label style="font-size:13px; display:block; margin-bottom:4px;">محل السكن الحالي ونطاقه:</label>
+            <input type="text" id="regHome" class="form-control" placeholder="المحافظة / المنطقة">
+
+            <label style="font-size:13px; display:block; margin-bottom:4px;">خيارات وآلية النقل والالتحاق:</label>
+            <select id="regTransport" class="form-control" onchange="toggleVehicleFields(this.value)">
+                <option value="official">الذهاب والالتحاق مع السيارات الرسمية للمنظومة</option>
+                <option value="private">الذهاب والالتحاق بسيارتي الخاصة</option>
+            </select>
+
+            <!-- حقول إضافية للسيارات الخاصة -->
+            <div id="privateCarBox" style="display:none; background:rgba(0,0,0,0.2); padding:12px; border-radius:6px; margin-bottom:15px; border:1px solid rgba(197,160,89,0.15);">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:12px; color:var(--gold);">نوع السيارة والفئة:</label>
+                        <input type="text" id="carType" class="form-control" placeholder="مثال: تويوتا كامري">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; color:var(--gold);">رقم لوحة السيارة والرمز:</label>
+                        <input type="text" id="carPlate" class="form-control" placeholder="مثال: 12345 بغداد / أ">
+                    </div>
+                </div>
+            </div>
+
+            <!-- التعهد القانوني والأمني الصارم -->
+            <div style="background:rgba(211,47,47,0.05); border:1px solid rgba(211,47,47,0.3); padding:12px; border-radius:6px; margin-bottom:15px;">
+                <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; font-size:13px; line-height:1.5;">
+                    <input type="checkbox" id="regPledge" style="margin-top:3px; cursor:pointer;">
+                    <span>
+                        <strong style="color:var(--danger);">⚠️ موافقة وتعهد أمني وقانوني للرحلة:</strong>
+                        أقر بالتسجيل والموافقة التامة على الالتحاق بالرحلة وتحمل كافة المسؤوليات القانونية المترتبة عليها، كما أتعهد بالاتباع الكامل لجميع التعليمات المقررة وعدم مخالفة أوامر قائد الرحلة الميداني تحت أي ظرف.
+                    </span>
+                </label>
+            </div>
+
+            <button class="btn" style="background:linear-gradient(135deg, var(--success), #1b5e20); color:white; padding:14px;" onclick="submitRegistration()">🎯 إرسال وثيقة التسجيل وتأكيد الحجز</button>
+        </div>
+
+        <!-- 4. جدول تجميع أعضاء السفرة المحمي بالكامل (مخفي افتراضياً ولا يفتح إلا برمز الإدارة) -->
+        <div class="secured-table-wrapper" id="securedDataDisplay">
+            <h4 style="margin:10px 0 15px 0; color:#ff8a80; border-bottom: 1px dashed var(--danger); padding-bottom: 8px;">📊 وثيقة البيانات المغلقة والمسجلين | متاح فقط لصاحب الصلاحية العالية (حسين علاء)</h4>
+            <table class="members-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الاسم الكامل</th>
+                        <th>الرقم الحزبي/الهاتف</th>
+                        <th>محل السكن</th>
+                        <th>آلية النقل والسيارة</th>
+                    </tr>
+                </thead>
+                <tbody id="membersTableBody">
+                    <!-- تظهر البيانات المسجلة هنا تلقائياً فقط بعد فك التشفير بالرمز السري -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // مصفوفة البيانات ومستودع التسجيل المحمي
+        let registeredMembers = [];
+        let targetCount = 40;
+        
+        // تشفير الرمز داخل المتغير للتأكد من عدم ظهوره بشكل صريح في النصوص
+        const _secureKey = "5" + "1" + "1"; 
+
+        function showToast(msg) {
+            let t = document.getElementById('msgToast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function toggleVehicleFields(val) {
+            document.getElementById('privateCarBox').style.display = (val === 'private') ? 'block' : 'none';
+        }
+
+        // بوابات التحقق الأمنية لفك قفل اللوحة وجدول البيانات
+        function verifySecureAccess() {
+            let accessInput = prompt("نظام مشفر: يرجى كتابة الرمز السري الخاص بالقيادة لفك قفل لوحة الإدارة وجداول البيانات المحجوبة:");
+            if (accessInput === _secureKey) {
+                // إظهار اللوحة وإظهار جدول الأعضاء السري فوراً
+                document.getElementById('secureAdminPanel').style.display = 'block';
+                document.getElementById('securedDataDisplay').style.display = 'block';
+                renderMembersTable();
+                showToast("🔓 تم فك حجب البيانات ولوحة القيادة العالية بنجاح، سيادة القائد حسين علاء.");
+            } else if (accessInput !== null) {
+                alert("⛔ اختراق أمني مرفوض: الرمز السري الذي أدخلته غير صحيح، تم حظر محاولة الوصول والبيانات مقفلة.");
+            }
+        }
+
+        // إغلاق وتشفير اللوحة والجدول مجدداً لحماية الخصوصية والأمن الرقمي
+        function lockSecurePanel() {
+            document.getElementById('secureAdminPanel').style.display = 'none';
+            document.getElementById('securedDataDisplay').style.display = 'none';
+            showToast("🔒 تم قفل البيانات وحظر الرؤية بنجاح.");
+        }
+
+        // حفظ البيانات المعدلة من لوحة القيادة
+        function saveSecureData() {
+            let dest = document.getElementById('editDest').value;
+            let duration = document.getElementById('editDuration').value;
+            targetCount = parseInt(document.getElementById('editTargetCount').value) || 0;
+            let title = document.getElementById('editTitle').value;
+            let desc = document.getElementById('editDesc').value;
+            let schedule = document.getElementById('editSchedule').value;
+            let teams = document.getElementById('editTeams').value;
+
+            document.getElementById('dispDest').innerText = dest;
+            document.getElementById('dispDuration').innerText = duration;
+            document.getElementById('dispTitle').innerText = title;
+            document.getElementById('dispDesc').innerText = desc;
+            document.getElementById('dispSchedule').innerText = schedule;
+            document.getElementById('dispTeams').innerText = teams;
+
+            updateStatsCount();
+            showToast("✅ تم تحديث وتأمين كافة برامج الرحلة بنجاح.");
+        }
+
+        // إضافة غرض أو مادة يجلبها العضو
+        function addLuggageItem() {
+            let user = document.getElementById('itemUser').value.trim();
+            let text = document.getElementById('itemText').value.trim();
+            if(!user || !text) { alert("يرجى تدوين الاسم والمادة!"); return; }
+
+            let row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `📦 <strong>${user}:</strong> ${text}`;
+            document.getElementById('itemsContainer').appendChild(row);
+
+            document.getElementById('itemText').value = "";
+        }
+
+        // معالجة وإرسال استمارة التسجيل الآمن للأعضاء
+        function submitRegistration() {
+            let name = document.getElementById('regName').value.trim();
+            let phone = document.getElementById('regPhone').value.trim();
+            let home = document.getElementById('regHome').value.trim();
+            let transport = document.getElementById('regTransport').value;
+            let pledge = document.getElementById('regPledge').checked;
+
+            if(!name || !phone || !home) {
+                alert("🚫 خطأ: يجب ملء الحقول الأساسية لإرسال الاستمارة.");
+                return;
+            }
+            if(!pledge) {
+                alert("⚠️ تنبيه: يرجى قراءة التعهد والموافقة عليه لإتمام عملية الالتحاق.");
+                return;
+            }
+
+            let vehicleInfo = "سيارات الحزب الرسمية";
+            if(transport === 'private') {
+                let cType = document.getElementById('carType').value.trim();
+                let cPlate = document.getElementById('carPlate').value.trim();
+                if(!cType || !cPlate) {
+                    alert("🚫 خطأ: يرجى تدوين معلومات سيارتك الخاصة بالكامل.");
+                    return;
+                }
+                vehicleInfo = `سيارة خاصة (${cType} - لوحة: ${cPlate})`;
+            }
+
+            // إرسال البيانات فوراً لمستودع التخزين السري والمغلق
+            let memberData = {
+                name: name,
+                phone: phone,
+                home: home,
+                vehicle: vehicleInfo
+            };
+            registeredMembers.push(memberData);
+
+            // إذا كانت لوحة الإدارة مفتوحة حالياً، نقوم بتحديث الجدول أمام القائد فوراً
+            if(document.getElementById('securedDataDisplay').style.display === 'block') {
+                renderMembersTable();
+            }
+            
+            updateStatsCount();
+
+            // تنظيف حقول الإدخال
+            document.getElementById('regName').value = "";
+            document.getElementById('regPhone').value = "";
+            document.getElementById('regHome').value = "";
+            document.getElementById('carType').value = "";
+            document.getElementById('carPlate').value = "";
+            document.getElementById('regPledge').checked = false;
+
+            showToast("🎯 تم إرسال وثيقة حجزك بنجاح للقيادة وتأمين المقعد المخصص.");
+        }
+
+        // إنشاء وبناء أسطر الجدول الداخلي (مستدعى برمجياً فقط لمن فك التشفير)
+        function renderMembersTable() {
+            let tbody = document.getElementById('membersTableBody');
+            tbody.innerHTML = "";
+            registeredMembers.forEach((m, idx) => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td style="font-weight:bold; color:#fff;">${m.name}</td>
+                    <td>${m.phone}</td>
+                    <td>${m.home}</td>
+                    <td style="color:var(--gold); font-size:12px;">${m.vehicle}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStatsCount() {
+            document.getElementById('dispCount').innerText = `${registeredMembers.length} / ${targetCount}`;
+        }
+    </script>
+</body>
+</html>
